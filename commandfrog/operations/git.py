@@ -5,7 +5,7 @@ from .files import directory, is_directory
 from .apt import apt_install
 from .ssh import ssh_keyscan
 
-from infra.drivers.driver import Driver
+from commandfrog.drivers.driver import Driver
 
 def repo(host: Driver, src: str, dest: str, ssh_key_path: Optional[str] = None):
     apt_install(host, ["git"])

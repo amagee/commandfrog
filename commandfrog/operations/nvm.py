@@ -1,5 +1,4 @@
-from infra.drivers.driver import Driver
-from .script import script_from_string
+from commandfrog.drivers.driver import Driver
 from .shell import get_shell_rc_file
 
 nvm_init_script = [
@@ -19,17 +18,17 @@ def install_nvm(host: Driver) -> None:
     host.exec("apt-get install -y curl", sudo=host.has_sudo)
     host.exec("curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash")
 
-    host.exec(script_from_string(host, src="\n".join(nvm_init_script)))
+    host.exec_as_script("\n".join(nvm_init_script))
 
     rc_file = get_shell_rc_file(host)
     if rc_file is not None:
         if host.exec(f"grep NVM_DIR {rc_file}").return_code != 0:
             for i, line in enumerate(nvm_init_script):
-                host.exec(script_from_string(host, "\n".join([
+                host.exec_as_script("\n".join([
                     f"cat >> {rc_file} <<EOF",
                     *nvm_init_script,
                     "EOF",
-                ])))
+                ]))
 
 
 def nvm_install(host: Driver, node_version: str):
@@ -39,7 +38,7 @@ def nvm_install(host: Driver, node_version: str):
     you run `nvm ls` should work.
     """
     install_nvm(host)
-    host.exec(script_from_string(host, src="\n".join([*nvm_init_script, f"nvm install {node_version}"])))
+    host.exec_as_script("\n".join([*nvm_init_script, f"nvm install {node_version}"]))
 
 
 def npm_install(host: Driver, node_version: str, cwd: str):
@@ -47,12 +46,12 @@ def npm_install(host: Driver, node_version: str, cwd: str):
     Run `npm install` in the directory `cwd`, after executing `nvm use
     {node_version}`.
     """
-    host.exec(script_from_string(host, src="\n".join([
+    host.exec_as_script("\n".join([
         *nvm_init_script,
         f"nvm use {node_version}",
         f"cd {cwd}",
         "npm install"
-    ])))
+    ]))
 
 
 

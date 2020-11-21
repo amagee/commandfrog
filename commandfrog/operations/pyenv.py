@@ -1,5 +1,4 @@
-from infra.drivers.driver import Driver
-from .script import script_from_string
+from commandfrog.drivers.driver import Driver
 from .shell import get_shell_rc_file
 from .apt import apt_install
 from .files import is_regular_file
@@ -46,11 +45,11 @@ def pyenv_install_rc(host: Driver):
     rc_file = get_shell_rc_file(host)
     if rc_file is not None:
         if host.exec(f"grep pyenv {rc_file}").return_code != 0:
-           host.exec(script_from_string(host, "\n".join([
+           host.exec_as_script("\n".join([
                 f"cat >> {rc_file} <<EOF",
                 *lines,
                 "EOF",
-            ])))
+            ]))
 
 
 def pyenv_install(host: Driver, python_version: str):

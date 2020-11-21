@@ -1,4 +1,4 @@
-from infra.drivers.driver import Driver
+from commandfrog.drivers.driver import Driver
 from .apt import apt_install
 from .files import is_regular_file
 from .ubuntu import get_ubuntu_codename

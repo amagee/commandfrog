@@ -7,10 +7,10 @@ import typer
 from loguru import logger
 import yaml
 
-from infra.drivers.driver import Driver
-from infra.drivers.ssh import SSHHost
-from infra.drivers.local import LocalHost
-from infra.drivers.docker import DockerHost
+from commandfrog.drivers.driver import Driver
+from commandfrog.drivers.ssh import SSHHost
+from commandfrog.drivers.local import LocalHost
+from commandfrog.drivers.docker import DockerHost
 
 
 

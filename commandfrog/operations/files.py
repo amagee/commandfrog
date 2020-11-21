@@ -1,4 +1,4 @@
-from infra.drivers.driver import Driver
+from commandfrog.drivers.driver import Driver
 
 
 def is_directory(host: Driver, path: str):

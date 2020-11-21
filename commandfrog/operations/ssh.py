@@ -1,5 +1,5 @@
-from infra.drivers.driver import Driver
-from infra.operations.files import is_regular_file
+from commandfrog.drivers.driver import Driver
+from commandfrog.operations.files import is_regular_file
 
 
 def ssh_keyscan(host: Driver, hostname: str):
