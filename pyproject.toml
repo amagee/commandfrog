@@ -1,0 +1,30 @@
+[build-system]
+requires = ["flit_core >=2,<4", "setuptools", "poetry_core>==1.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.flit.metadata]
+module = "infra"
+author = "Andrew Magee"
+author-email = "amagee@gmail.com"
+home-page = "https://github.com/amagee/infra"
+classifiers = ["License :: OSI Approved :: MIT License"]
+
+[tool.poetry]
+name = "infra"
+version = "0.1.0"
+description = "Infra"
+authors = ["Andrew Magee"]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+paramiko = "^2.7.2"
+loguru = "^0.5.3"
+setuptools = "^50.3.2"
+dephell = "^0.8.3"
+ipython = "^7.19.0"
+typer = "^0.3.2"
+PyYAML = "^5.3.1"
+
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
