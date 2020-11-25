@@ -44,9 +44,9 @@ def pyenv_install_rc(host: Driver):
     ]
     rc_file = get_shell_rc_file(host)
     if rc_file is not None:
-        if host.exec(f"grep pyenv {rc_file}").return_code != 0:
-           host.exec_as_script("\n".join([
-                f"cat >> {rc_file} <<EOF",
+        if host.exec(f"grep pyenv {rc_file}", assert_ok=False).return_code != 0:
+            host.exec_as_script("\n".join([
+                f"cat >> {rc_file} <<'EOF'",
                 *lines,
                 "EOF",
             ]))
