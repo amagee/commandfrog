@@ -25,6 +25,12 @@ ipython = "^7.19.0"
 typer = "^0.3.2"
 PyYAML = "^5.3.1"
 
+[tool.poetry.dev-dependencies]
+pyinstaller = "^4.1"
+
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "setuppy", path = "setup.py"}
+
+[tool.poetry.scripts]
+build = "build.__init__:build"
