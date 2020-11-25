@@ -1,4 +1,5 @@
 import importlib
+import os
 import subprocess
 import sys
 from typing import Dict
@@ -47,8 +48,15 @@ def main(host: str, deploy: str, config: str = None):
         username, hostname = host.split("@", maxsplit=1)
         host_ob = SSHHost(hostname=hostname, username=username, config=config_ob)
 
-    module_name, func_name = deploy.rsplit(".", maxsplit=1)
-    deploy_func = getattr(importlib.import_module(module_name), func_name)
+    # Don't assume the caller has a real Python environment setup (they may be calling
+    # from the PyInstaller package), so support an arbitrary path to a Python file rather
+    # than a regular Python import path.
+    path, func_name = deploy.split(":")
+    sys.path.insert(0, os.path.dirname(path))
+    # For PyInstaller
+    sys.path.append(os.path.dirname(sys.executable))
+    module = importlib.import_module(os.path.basename(path.rstrip(".py")))
+    deploy_func  = getattr(module, func_name)
 
     try:
         deploy_func(host_ob)
