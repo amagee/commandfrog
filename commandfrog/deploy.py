@@ -2,7 +2,7 @@ import importlib
 import os
 import subprocess
 import sys
-from typing import Dict
+from typing import Any, Dict, Optional, cast
 
 import typer
 from loguru import logger
@@ -12,6 +12,7 @@ from commandfrog.drivers.driver import Driver
 from commandfrog.drivers.ssh import SSHHost
 from commandfrog.drivers.local import LocalHost
 from commandfrog.drivers.docker import DockerHost
+from commandfrog.config import Config
 
 
 
@@ -24,15 +25,7 @@ def main(host: str, deploy: str, config: str = None):
     )
 
     host_ob: Driver
-    config_ob: Dict
-
-    if config is not None:
-        if config.lower().endswith((".yaml", ".yml")):
-            config_ob = yaml.safe_load(open(config).read())
-        else:
-            raise ValueError("We only support yaml config")
-    else:
-        config_ob = {}
+    config_ob = get_config_ob_from_path(config)
 
     if host == "@local":
         host_ob = LocalHost(config=config_ob)
@@ -62,6 +55,29 @@ def main(host: str, deploy: str, config: str = None):
         deploy_func(host_ob)
     finally:
         host_ob.disconnect()
+
+
+def get_config_ob_from_path(path: Optional[str] = None) -> Config:
+    if path is not None:
+        if path.lower().endswith((".yaml", ".yml")):
+            with open(path) as f:
+                content = f.read()
+            return get_config_ob_from_dict(yaml.safe_load(content))
+        else:
+            raise ValueError("We only support yaml config")
+    else:
+        return get_config_ob_from_dict({})
+
+
+def get_config_ob_from_dict(dct: Dict) -> Config:
+    dataclass_fields = cast(Any, Config).__dataclass_fields__
+
+    config = Config(**{k: v for k, v in dct.items() if k in dataclass_fields})
+    for k, v in dct.items():
+        if k not in dataclass_fields:
+            setattr(config, k, v)
+
+    return config
 
 
 if __name__ == "__main__":

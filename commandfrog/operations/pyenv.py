@@ -64,12 +64,18 @@ def pyenv_install(host: Driver, python_version: str):
 def pyenv_virtualenv(host: Driver, python_version: str, virtualenv_name: str):
     install_pyenv(host)
 
-    if f"{python_version}/envs/{virtualenv_name}" in host.exec("~/.pyenv/bin/pyenv virtualenvs --bare").stdout.decode():
+    if (
+        f"{python_version}/envs/{virtualenv_name}"
+        in host.exec("~/.pyenv/bin/pyenv virtualenvs --bare").stdout.decode().splitlines()
+    ):
         return
 
     host.exec(f"~/.pyenv/bin/pyenv virtualenv {python_version} {virtualenv_name}")
 
 
 def pip_install(host: Driver, python_version: str, virtualenv_name: str, what_to_install: str):
-    host.exec(f"~/.pyenv/versions/{python_version}/envs/{virtualenv_name}/bin/pip install {what_to_install}")
+    host.exec(f"{virtualenv_dir(python_version, virtualenv_name)}/bin/pip install {what_to_install}")
 
+
+def virtualenv_dir(python_version: str, virtualenv_name: str) -> str:
+    return f"~/.pyenv/versions/{python_version}/envs/{virtualenv_name}"

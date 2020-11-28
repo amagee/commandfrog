@@ -12,7 +12,8 @@ def apt_update(host: Driver):
 
 
 def apt_install(host: Driver, packages: List[str]):
-    host.exec(f"apt-get install -y {' '.join(packages)}", sudo=host.has_sudo)
-
-
+    installed_packages = host.exec("dpkg --get-selections |grep -v deinstall |cut -f 1").stdout.splitlines()
+    packages_to_install = set(packages) - set(installed_packages)
+    if packages_to_install:
+        host.exec(f"apt-get install -y {' '.join(packages_to_install)}", sudo=host.has_sudo)
 
