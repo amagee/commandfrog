@@ -21,13 +21,13 @@ paramiko = "^2.7.2"
 loguru = "^0.5.3"
 setuptools = "^50.3.2"
 dephell = "^0.8.3"
-ipython = "^7.19.0"
 typer = "^0.3.2"
 PyYAML = "^5.3.1"
 
 [tool.poetry.dev-dependencies]
 pyinstaller = "^4.1"
 mypy = "^0.790"
+ipython = "^7.19.0"
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
