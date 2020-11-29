@@ -2,7 +2,12 @@ from commandfrog.drivers.driver import Driver
 
 
 def exists(host: Driver, path: str):
-    return host.exec(f"[[ -e {path} || -L {path} ]]", assert_ok=False).return_code == 0
+    if host.exec(f"test -e {path}", assert_ok=False).return_code == 0:
+        return True
+    elif host.exec(f"test -L {path}", assert_ok=False).return_code == 0:
+        return True
+    else:
+        return False
 
 
 def is_directory(host: Driver, path: str):
