@@ -70,6 +70,7 @@ def pyenv_virtualenv(host: Driver, python_version: str, virtualenv_name: str):
     ):
         return
 
+    pyenv_install(host, python_version)
     host.exec(f"~/.pyenv/bin/pyenv virtualenv {python_version} {virtualenv_name}")
 
 
