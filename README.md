@@ -56,7 +56,7 @@ form `path:function_name` where `function_name` is a top-level function in the
 Python file.
 
 Currently config, if specified at all, must be in a YAML file. The only
-configuration parameter recognised by commandfrom is `ask_for_sudo_password`,
+configuration parameter recognised by commandfrog is `ask_for_sudo_password`,
 which is false by default (useful for Docker images where you're running as
 root or on machines where the user has passwordless sudo). However, you can add
 arbitrary parameters to the config file and access them in your function. For example,
