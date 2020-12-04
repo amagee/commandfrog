@@ -10,12 +10,6 @@ appropriate.
 
 ## Getting started
 
-    # Install
-    git clone https://github.com/amagee/commandfrog.git
-    cd commandfrog
-    pip install poetry
-    poetry install
-
     # Scripts are just Python files
     cat >install_neovim.py <<EOF
     from commandfrog.operations.apt import apt_install
@@ -31,8 +25,20 @@ appropriate.
     ask_for_sudo_password: true
     EOF
 
+    # From source:
+    # Install:
+    git clone https://github.com/amagee/commandfrog.git
+    cd commandfrog
+    pip install poetry
+    poetry install
+
     # Run our script to install neovim locally
-    python commandfrog/deploy.py @local install_neovim.py:install_neovim --config=config.yml
+    python commandfrog/commandfrog.py @local install_neovim.py:install_neovim --config=config.yml
+
+    # Or, use the pre-built binary (Currently built for Linux only)
+    wget https://raw.githubusercontent.com/amagee/commandfrog-builds/main/commandfrog
+    chmod +x commandfrog
+    ./commandfrog @local install_neovim.py:install_neovim --config=config.yml
 
 commandfrog can run on:
 
@@ -68,7 +74,7 @@ arbitrary parameters to the config file and access them in your function. For ex
         print(host.config.myparam2)
     EOF
 
-    python commandfrog/deploy.py @local print_params.py:print_params --config=config.yml
+    python commandfrog/commandfrog.py @local print_params.py:print_params --config=config.yml
 
 will print
 

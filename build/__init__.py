@@ -17,8 +17,10 @@ def build():
                 [["--hidden-import", f"commandfrog.operations.{f}"] for f in operations]
             ),
             "-F",
-            "deploy.py",
+            "commandfrog.py",
         ],
         cwd="commandfrog",
         check=True,
     )
+    
+    subprocess.run("cp dist commandfrog-builds", cwd="commandfrog", check=True, shell=True)
