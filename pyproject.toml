@@ -16,7 +16,8 @@ description = "Infra"
 authors = ["Andrew Magee"]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+# Some weirdness in installing pudb, it asked us to change from ">=3.8" to ">=3.8,<4.0"
+python = ">=3.8,<4.0"
 paramiko = "^2.7.2"
 loguru = "^0.5.3"
 setuptools = "^50.3.2"
@@ -28,6 +29,10 @@ PyYAML = "^5.3.1"
 pyinstaller = "^4.1"
 mypy = "^0.790"
 ipython = "^7.19.0"
+pytest = "^6.2.1"
+docker = "^4.4.1"
+pudb = "^2020.1"
+pytest-pudb = "^0.7.0"
 
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}

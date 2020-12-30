@@ -1,15 +1,16 @@
-import subprocess
-from io import StringIO, BytesIO
-import shlex
-import tempfile
+from io import StringIO
 import os
-from typing import Dict, Optional, Union
+import shlex
+import subprocess
+import tempfile
+from typing import Optional, Union
 
 from loguru import logger
 
 from commandfrog.config import Config
-from commandfrog.drivers.driver import Driver, Result
+from commandfrog.drivers.driver import Driver
 from commandfrog.operations.files import directory
+
 from .util import execute_command
 
 
@@ -48,19 +49,23 @@ class DockerHost(Driver):
             cmd = f"docker cp {fp.name} {self.container_id}:{path}"
             logger.debug("Executing command: {}", cmd)
             subprocess.run(cmd, shell=True, check=True)
-            self.exec(f"chmod 600 {path}")
+            self.exec(f"chmod {mode} {path}")
 
-    def base_exec(self, cmd, assert_ok=True):
-        cmd = f"docker exec {self.container_id} sh -c {shlex.quote(cmd)}",
+    def base_exec(self, cmd: str, assert_ok: bool = True):
+        if self.container_id is None:
+            raise ValueError("...")
+        cmd = f"docker exec {self.container_id} sh -c {shlex.quote(cmd)}"
         return execute_command(cmd, assert_ok=assert_ok)
 
-    def commit(self):
+    def commit(self) -> str:
+        """
+        Run `docker commit`, return the new image ID.
+        """
         proc = subprocess.run(f"docker commit {self.container_id}", stdout=subprocess.PIPE, shell=True)
-        new_image_id = proc.stdout.decode().strip().split(":")[1]
-        print(f"New image id is {new_image_id}")
+        return proc.stdout.decode().strip().split(":")[1]
 
-    def disconnect(self):
-        self.commit()
+    def disconnect(self) -> str:
+        return self.commit()
 
 
 

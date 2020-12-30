@@ -48,13 +48,16 @@ def main(host: str, deploy: str, config: str = None):
     sys.path.insert(0, os.path.dirname(path))
     # For PyInstaller
     sys.path.append(os.path.dirname(sys.executable))
-    module = importlib.import_module(os.path.basename(path.rstrip(".py")))
+
+    if path.endswith(".py"):
+        path = path[0:-len(".py")]
+    module = importlib.import_module(os.path.basename(path))
     deploy_func  = getattr(module, func_name)
 
     try:
         deploy_func(host_ob)
     finally:
-        host_ob.disconnect()
+        return host_ob.disconnect()
 
 
 def get_config_ob_from_path(path: Optional[str] = None) -> Config:
