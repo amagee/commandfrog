@@ -9,7 +9,7 @@ def install_docker(host: Driver):
         return
 
     apt_install(host, ["apt-transport-https", "ca-certificates", "curl", "gnupg-agent", "software-properties-common"])
-    host.exec("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -", sudo=host.has_sudo)
+    host.exec("sh -c 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -'", sudo=True)
 
     ubuntu_codename = get_ubuntu_codename(host)
     if ubuntu_codename == "groovy":
@@ -17,13 +17,13 @@ def install_docker(host: Driver):
         # but we can fall back to focal and everything seems to work.
         ubuntu_codename = "focal"
 
-    host.exec(f'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu {ubuntu_codename} stable"', sudo=host.has_sudo)
-    host.exec("apt-get update -y", sudo=host.has_sudo)
+    host.exec(f'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu {ubuntu_codename} stable" -y', sudo=True)
+    host.exec("apt-get update -y", sudo=True)
     apt_install(host, ["docker-ce", "docker-ce-cli", "containerd.io"])
-    host.exec("service docker start", sudo=host.has_sudo)
+    host.exec("service docker start", sudo=True)
 
     if host.exec("whoami").stdout.decode().strip() != "root":
-        host.exec("usermod -aG docker $USER", sudo=host.has_sudo)
+        host.exec("usermod -aG docker $USER", sudo=True)
 
 
 def install_docker_compose(host: Driver):

@@ -74,8 +74,20 @@ def pyenv_virtualenv(host: Driver, python_version: str, virtualenv_name: str):
     host.exec(f"~/.pyenv/bin/pyenv virtualenv {python_version} {virtualenv_name}")
 
 
-def pip_install(host: Driver, python_version: str, virtualenv_name: str, what_to_install: str):
-    host.exec(f"{virtualenv_dir(python_version, virtualenv_name)}/bin/pip install {what_to_install}")
+def pip_install(
+    host: Driver,
+    python_version: str,
+    virtualenv_name: str,
+    what_to_install: str,
+    editable: bool = False
+):
+    host.exec_as_script("\n".join([
+        'export PATH="$HOME/.pyenv/bin:$PATH"',
+        'eval "$(pyenv init -)"',
+        'eval "$(pyenv virtualenv-init -)"',
+        f"pyenv activate {virtualenv_name}",
+        f"pip install {'-e' if editable else ''} {what_to_install}"
+    ]))
 
 
 def virtualenv_dir(python_version: str, virtualenv_name: str) -> str:
