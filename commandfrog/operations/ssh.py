@@ -1,8 +1,10 @@
 from commandfrog.drivers.driver import Driver
-from commandfrog.operations.files import is_regular_file
+from commandfrog.operations.files import is_regular_file, directory
 
 
 def ssh_keyscan(host: Driver, hostname: str):
+    directory(host, "~/.ssh")
+
     if not is_regular_file(host, "~/.ssh/known_hosts"):
         host.exec("touch ~/.ssh/known_hosts")
 
