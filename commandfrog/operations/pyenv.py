@@ -66,7 +66,7 @@ def pyenv_virtualenv(host: Driver, python_version: str, virtualenv_name: str):
 
     if (
         f"{python_version}/envs/{virtualenv_name}"
-        in host.exec("~/.pyenv/bin/pyenv virtualenvs --bare").stdout.decode().splitlines()
+        in host.exec("~/.pyenv/bin/pyenv virtualenvs --bare", echo_stdout=False).stdout.decode().splitlines()
     ):
         return
 
