@@ -57,7 +57,13 @@ def main(host: str, deploy: str, config: str = None):
     try:
         deploy_func(host_ob)
     finally:
-        return host_ob.disconnect()
+        # Note: for some reason, if we just do `return host_ob.disconnect()`
+        # here, exception output / stack traces can get swallowed, which
+        # doesn't happen if we assign to `result` and then return outside of
+        # the finally clause.
+        result = host_ob.disconnect()
+
+    return result
 
 
 def get_config_ob_from_path(path: Optional[str] = None) -> Config:
