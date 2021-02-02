@@ -4,7 +4,7 @@ from .files import is_regular_file
 from .ubuntu import get_ubuntu_codename
 
 
-def install_docker(host: Driver):
+def install_docker(host: Driver, client_only: bool = False):
     if host.exec("which docker", assert_ok=False).return_code == 0:
         return
 
@@ -19,8 +19,11 @@ def install_docker(host: Driver):
 
     host.exec(f'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu {ubuntu_codename} stable" -y', sudo=True)
     host.exec("apt-get update -y", sudo=True)
-    apt_install(host, ["docker-ce", "docker-ce-cli", "containerd.io"])
-    host.exec("service docker start", sudo=True)
+    if client_only:
+        apt_install(host, ["docker-ce-cli"])
+    else:
+        apt_install(host, ["docker-ce", "docker-ce-cli", "containerd.io"])
+        host.exec("service docker start", sudo=True)
 
     if host.exec("whoami").stdout.decode().strip() != "root":
         host.exec("usermod -aG docker $USER", sudo=True)
