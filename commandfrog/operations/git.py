@@ -12,7 +12,9 @@ def repo(host: Driver, src: str, dest: str, ssh_key_path: Optional[str] = None):
 
     directory(host, dest)
 
-    repo_name = src.split("/")[-1].rstrip(".git")
+    repo_path = src.split("/")[-1]
+    assert repo_path.endswith(".git")
+    repo_name = repo_path[0:-len(".git")]
 
     if is_directory(host, f"{dest}/{repo_name}"):
         return
