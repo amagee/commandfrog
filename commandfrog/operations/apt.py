@@ -1,4 +1,5 @@
 from commandfrog.drivers.driver import Driver
+from commandfrog.drivers.exceptions import CommandFailed
 from typing import List
 
 
@@ -12,8 +13,17 @@ def apt_update(host: Driver):
 
 
 def apt_install(host: Driver, packages: List[str]):
-    installed_packages = host.exec("dpkg --get-selections |grep -v deinstall |cut -f 1").stdout.splitlines()
+    installed_packages = host.exec(
+        "dpkg --get-selections |grep -v deinstall |cut -f 1",
+        echo_stdout=False,
+        echo_stderr=False,
+    ).stdout.splitlines()
     packages_to_install = set(packages) - set(installed_packages)
     if packages_to_install:
-        host.exec(f"apt-get install -y {' '.join(packages_to_install)}", sudo=host.has_sudo)
+        try:
+            host.exec(f"apt-get install -y {' '.join(packages_to_install)}", sudo=host.has_sudo)
+        except CommandFailed as e:
+            if "Unable to locate package" in e.stderr.decode():
+                apt_update(host)
+                host.exec(f"apt-get install -y {' '.join(packages_to_install)}", sudo=host.has_sudo)
 
