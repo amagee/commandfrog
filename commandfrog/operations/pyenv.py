@@ -1,12 +1,23 @@
+from typing import List
+
 from commandfrog.drivers.driver import Driver
-from .shell import get_shell_rc_file
+
 from .apt import apt_install
-from .files import is_regular_file
+from .files import is_regular_file, exists
+from .shell import get_shell_rc_file
 
 
 def install_pyenv(host: Driver):
     if is_regular_file(host, "~/.pyenv/bin/pyenv"):
         return
+
+    # If you don't have tzdata setup, consult the web service at
+    # ipapi.co/timezone to get the correct time zone and put it in
+    # /etc/localtime. Otherwise installing the following packages would
+    # interactively prompt for your time zone.
+    # https://stackoverflow.com/a/63153978/223486
+    if not exists(host, "/etc/localtime"):
+        host.exec("ln -snf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime")
 
     apt_install(host, [
         # Required to install pyenv itself
