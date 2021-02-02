@@ -21,7 +21,18 @@ class LocalHost(Driver):
         elif isinstance(mode, str):
             os.chmod(path, int(mode, 8))
 
-    def base_exec(self, cmd: str, assert_ok: bool = True):
-        return execute_command(cmd, assert_ok=assert_ok)
+    def base_exec(
+        self,
+        cmd: str,
+        echo_stdout: bool = True,
+        echo_stderr: bool = True,
+        assert_ok: bool = True
+    ):
+        return execute_command(
+            cmd,
+            echo_stdout=echo_stdout,
+            echo_stderr=echo_stderr,
+            assert_ok=assert_ok
+        )
 
 
