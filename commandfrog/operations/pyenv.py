@@ -90,5 +90,27 @@ def pip_install(
     ]))
 
 
+def install_python_app(
+    host: Driver,
+    python_version: str,
+    virtualenv_name: str,
+    install_cmd: str,
+    binaries: List[str]
+):
+    pyenv_virtualenv(host, python_version, virtualenv_name)
+
+    host.exec_as_script(f"""
+        export PATH="$HOME/.pyenv/bin:$PATH"
+        eval "$(pyenv init -)"
+        eval "$(pyenv virtualenv-init -)"
+        pyenv activate {python_version}/envs/{virtualenv_name}
+        {install_cmd}
+    """)
+
+    for b in binaries:
+        link(host, link_name=f"~/bin/{b}", target=f"{virtualenv_dir(python_version, virtualenv_name)}/bin/{b}")
+
+
+
 def virtualenv_dir(python_version: str, virtualenv_name: str) -> str:
     return f"~/.pyenv/versions/{python_version}/envs/{virtualenv_name}"
