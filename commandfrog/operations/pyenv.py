@@ -80,7 +80,7 @@ def pip_install(
     virtualenv_name: str,
     what_to_install: str,
     editable: bool = False
-):
+) -> None:
     host.exec_as_script("\n".join([
         'export PATH="$HOME/.pyenv/bin:$PATH"',
         'eval "$(pyenv init -)"',
