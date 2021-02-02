@@ -83,7 +83,7 @@ class Driver:
         LocalHost(config=self.config).exec(cmd)
 
     def exec_as_script(self, src: str, sudo: bool = False):
-        temp_file = f"/tmp/pyinfra-{uuid4()}"
+        temp_file = f"/tmp/commandfrog-{uuid4()}"
         self.put(temp_file, StringIO(src))
         try:
             self.exec(f"chmod +x {temp_file}")
