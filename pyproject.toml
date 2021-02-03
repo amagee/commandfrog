@@ -11,13 +11,13 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 
 [tool.poetry]
 name = "commandfrog"
-version = "0.2.1"
+version = "0.2.3"
 description = "Infra"
 authors = ["Andrew Magee"]
 
 [tool.poetry.dependencies]
 # Some weirdness in installing pudb, it asked us to change from ">=3.8" to ">=3.8,<4.0"
-python = ">=3.8,<4.0"
+python = ">=3.6,<4.0"
 paramiko = "^2.7.2"
 loguru = "^0.5.3"
 setuptools = "^53.0.0"
