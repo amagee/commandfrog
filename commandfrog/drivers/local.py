@@ -9,6 +9,8 @@ from .util import execute_command
 
 class LocalHost(Driver):
     def put(self, path: str, contents: Union[str, bytes, StringIO], mode: Optional[Union[str, int]] = None):
+        path = os.path.expanduser(path)
+
         if isinstance(contents, (str, StringIO)):
             with open(path, "w+") as text_file:
                 text_file.write(contents.getvalue() if isinstance(contents, StringIO) else contents)
