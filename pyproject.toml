@@ -11,7 +11,7 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 
 [tool.poetry]
 name = "commandfrog"
-version = "0.2.3"
+version = "0.3.0"
 description = "Infra"
 authors = ["Andrew Magee"]
 
