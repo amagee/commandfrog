@@ -1,12 +1,13 @@
-from getpass import getpass
+from functools import lru_cache
 from io import StringIO
 import shlex
-from typing import Optional, Union, Dict, List
+from typing import Dict, Optional, Union
 from uuid import uuid4
 
 from loguru import logger
 
 from commandfrog.config import Config
+from commandfrog.operations.platform import get_platform
 
 
 class Driver:
@@ -40,7 +41,7 @@ class Driver:
                         ]),
                         mode=int("0700", 8)
                     )
-                cmd = f"env pwd={self.env['sudo_password']} SUDO_ASKPASS=/tmp/askpass sudo -A sh -c {shlex.quote(cmd)}"
+                cmd = f"env pwd={shlex.quote(self.env['sudo_password'])} SUDO_ASKPASS=/tmp/askpass sudo -A sh -c {shlex.quote(cmd)}"
             else:
                 cmd = "sudo " + cmd
         return self.base_exec(
@@ -54,6 +55,11 @@ class Driver:
     def home_dir(self) -> str:
         result = self.exec("eval echo ~`whoami`")
         return result.stdout.decode().strip()
+
+    @property
+    @lru_cache
+    def platform(self) -> str:
+        return get_platform(self)
 
     def commit(self) -> None:
         pass

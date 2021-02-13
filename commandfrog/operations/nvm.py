@@ -1,5 +1,7 @@
 from commandfrog.drivers.driver import Driver
 from .shell import get_shell_rc_file
+from .apt import apt_install
+from .pacman import pacman_install
 
 nvm_init_script = [
     '''export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"''',
@@ -15,7 +17,13 @@ def install_nvm(host: Driver) -> None:
     if stdout.decode().strip() == "0":
         return
 
-    host.exec("apt-get install -y curl", sudo=host.has_sudo)
+    if host.platform == "ubuntu":
+        apt_install(host, ["curl"])
+    elif host.platform == "arch":
+        pacman_install(host, ["curl"])
+    else:
+        print("Neither ubuntu nor arch, let's continue and hope we have curl")
+
     host.exec("curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash")
 
     host.exec_as_script("\n".join(nvm_init_script))

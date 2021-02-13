@@ -14,6 +14,8 @@ from .util import log_output_line
 from .exceptions import CommandFailed
 
 class SSHHost(Driver):
+    has_sudo = True
+
     def __init__(
         self,
         config: Config,
@@ -59,24 +61,30 @@ class SSHHost(Driver):
                 mode_arg = mode
             stdin, stdout, stderr = self.client.exec_command(f"chmod {mode_arg} {path}")
 
-    def base_exec(self, cmd: str, assert_ok: bool = True):
+    def base_exec(
+        self,
+        cmd: str,
+        assert_ok: bool = True,
+        echo_stdout: bool = True,
+        echo_stderr: bool = True
+    ):
         result = stream_exec(self.client, cmd)
         if assert_ok and result.return_code != 0:
-            raise CommandFailed(cmd)
+            raise CommandFailed(cmd, result.stdout, result.stderr)
         return result
 
 
 def stream_exec(ssh: paramiko.SSHClient, cmd: str):
     # https://stackoverflow.com/a/32758464/223486
     # one channel per command
-    stdin, stdout, stderr = ssh.exec_command(cmd) 
+    stdin, stdout, stderr = ssh.exec_command(cmd)
     # get the shared channel for stdout/stderr/stdin
     channel = stdout.channel
 
     # we do not need stdin.
-    stdin.close()                 
+    stdin.close()
     # indicate that we're not going to write to that channel anymore
-    channel.shutdown_write()      
+    channel.shutdown_write()
 
     # read stdout/stderr in order to prevent read block hangs
     stdout_chunks = []
@@ -90,22 +98,22 @@ def stream_exec(ssh: paramiko.SSHClient, cmd: str):
     #stderr_chunks.append(content)
 
     # chunked read to prevent stalls
-    while not channel.closed or channel.recv_ready() or channel.recv_stderr_ready(): 
+    while not channel.closed or channel.recv_ready() or channel.recv_stderr_ready():
         # stop if channel was closed prematurely, and there is no data in the buffers.
         got_chunk = False
         readq, _, _ = select.select([stdout.channel], [], [])
         for c in readq:
-            if c.recv_ready(): 
+            if c.recv_ready():
                 content = stdout.channel.recv(len(c.in_buffer))
                 log_output_line(content.decode(), end='')
                 stdout_chunks.append(content)
                 got_chunk = True
-            if c.recv_stderr_ready(): 
-                # make sure to read stderr to prevent stall    
+            if c.recv_stderr_ready():
+                # make sure to read stderr to prevent stall
                 content = stderr.channel.recv_stderr(len(c.in_stderr_buffer))
                 log_output_line(content.decode(), end='')
                 stderr_chunks.append(content)
-                got_chunk = True  
+                got_chunk = True
         '''
         1) make sure that there are at least 2 cycles with no data in the input
            buffers in order to not exit too early (i.e. cat on a >200k file).
@@ -118,9 +126,9 @@ def stream_exec(ssh: paramiko.SSHClient, cmd: str):
             and stdout.channel.exit_status_ready()
             and not stderr.channel.recv_stderr_ready()
             and not stdout.channel.recv_ready()
-        ): 
+        ):
             # indicate that we're not going to read from this channel anymore
-            stdout.channel.shutdown_read()  
+            stdout.channel.shutdown_read()
             # close the channel
             stdout.channel.close()
             break    # exit as remote side is finished and our bufferes are empty

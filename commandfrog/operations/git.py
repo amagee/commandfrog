@@ -1,14 +1,26 @@
 import re
-from typing import Optional
+from typing import Optional, List
 
 from .files import directory, is_directory
 from .apt import apt_install
 from .ssh import ssh_keyscan
 
 from commandfrog.drivers.driver import Driver
+from commandfrog.operations.platform import get_platform
+from commandfrog.drivers.exceptions import CommandFailed
+from commandfrog.operations.pacman import pacman_install
+
+
+def install_git(host: Driver):
+    platform = get_platform(host)
+    if platform == "ubuntu":
+        apt_install(host, ["git"])
+    elif platform == "arch":
+        pacman_install(host, ["git"])
+
 
 def repo(host: Driver, src: str, dest: str, ssh_key_path: Optional[str] = None):
-    apt_install(host, ["git"])
+    install_git(host)
 
     directory(host, dest)
 

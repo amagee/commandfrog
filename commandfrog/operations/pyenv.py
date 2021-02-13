@@ -3,8 +3,9 @@ from typing import List
 from commandfrog.drivers.driver import Driver
 
 from .apt import apt_install
-from .files import is_regular_file, exists
+from .files import is_regular_file, exists, link
 from .shell import get_shell_rc_file
+from .pacman import pacman_install
 
 
 def install_pyenv(host: Driver):
@@ -19,30 +20,35 @@ def install_pyenv(host: Driver):
     if not exists(host, "/etc/localtime"):
         host.exec("ln -snf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime")
 
-    apt_install(host, [
-        # Required to install pyenv itself
-        "curl",
-        "git",
+    if host.platform == "ubuntu":
+        apt_install(host, [
+            # Required to install pyenv itself
+            "curl",
+            "git",
 
-        # Required to use pyenv to install Python versions
-        "build-essential",
-        "libssl-dev",
-        "zlib1g-dev",
-        "libbz2-dev",
-        "libreadline-dev",
-        "libsqlite3-dev",
-        "llvm",
-        "libncurses5-dev",
-        "libncursesw5-dev",
-        "xz-utils",
-        "tk-dev",
-        "libffi-dev",
-        "liblzma-dev",
+            # Required to use pyenv to install Python versions
+            "build-essential",
+            "libssl-dev",
+            "zlib1g-dev",
+            "libbz2-dev",
+            "libreadline-dev",
+            "libsqlite3-dev",
+            "llvm",
+            "libncurses5-dev",
+            "libncursesw5-dev",
+            "xz-utils",
+            "tk-dev",
+            "libffi-dev",
+            "liblzma-dev",
 
-        # Possibly was required for earlier versions of Ubuntu? Doesn't seem to
-        # exist anymore and we seem to be fine without it.
-        #"python-openssl",
-    ])
+            # Possibly was required for earlier versions of Ubuntu? Doesn't seem to
+            # exist anymore and we seem to be fine without it.
+            #"python-openssl",
+        ])
+    elif host.platform == "arch":
+        pacman_install(host, ["git", "base-devel"])
+    else:
+        raise ValueError("Don't know what to install on this platform")
 
     host.exec("curl https://pyenv.run |bash")
 
@@ -120,7 +126,6 @@ def install_python_app(
 
     for b in binaries:
         link(host, link_name=f"~/bin/{b}", target=f"{virtualenv_dir(python_version, virtualenv_name)}/bin/{b}")
-
 
 
 def virtualenv_dir(python_version: str, virtualenv_name: str) -> str:
