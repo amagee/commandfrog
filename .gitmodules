@@ -1,0 +1,3 @@
+[submodule "commandfrog-builds"]
+	path = commandfrog-builds
+	url = git@github.com:amagee/commandfrog-builds.git

@@ -9,18 +9,19 @@ def build():
 
     operations = [p.stem for p in (Path("commandfrog") / "operations").glob("*.py")]
 
+    # This creates a binary in `commandfrog/dist/run`.
     subprocess.run(
         [
             "pyinstaller",
             *reduce(
-                operator.iconcat, 
+                operator.iconcat,
                 [["--hidden-import", f"commandfrog.operations.{f}"] for f in operations]
             ),
             "-F",
-            "commandfrog.py",
+            "run.py",
         ],
         cwd="commandfrog",
         check=True,
     )
-    
-    subprocess.run("cp dist commandfrog-builds", cwd="commandfrog", check=True, shell=True)
+
+    subprocess.run("cp commandfrog/dist/run commandfrog-builds/commandfrog", check=True, shell=True)
